@@ -5,3 +5,5 @@ class RegisterSchema(BaseModel):
     first_name: str
     last_name: str
     password: str
+    university: str
+    state: str
