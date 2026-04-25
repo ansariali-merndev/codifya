@@ -1,10 +1,12 @@
 from src.utils import success_res, error_res, hash_password, get_otp
-from src.schemas import RegisterSchema
+from src.schemas import RegisterSchema, VerifyOtpSchema, JWT_Payload
 from src.models import User
 from sqlalchemy.orm import Session
 from src.configs import send_mail
 from sqlalchemy import select
 from datetime import datetime, timezone, timedelta
+from src.utils import create_token
+from env import ENV
 
 
 def auth_root_func():
@@ -50,5 +52,61 @@ async def register_func(body: RegisterSchema, db: Session):
     await send_mail(body.email, otp)
 
     return success_res(
-        message="User registered successfully. Please verify your email using OTP."
+        "User registered successfully. Please verify your email using OTP.", 201
     )
+
+
+def verify_otp_func(body: VerifyOtpSchema, db: Session, response):
+    stmt = select(User).where(User.email == body.email)
+    user = db.execute(stmt).scalar_one_or_none()
+
+    if not user:
+        return error_res("Please register again to continue", 404)
+
+    if user.is_verified:
+        return error_res(
+            "This email address has already been verified. Kindly log in to continue.",
+            400,
+        )
+
+    if user.otp != body.otp:
+        return error_res(
+            "Invalid OTP. Please enter the correct verification code.", 400
+        )
+
+    if not user.otp_expiry or datetime.now(timezone.utc) > user.otp_expiry.replace(
+        tzinfo=timezone.utc
+    ):
+        return error_res("OTP has expired. Please request a new one.", 400)
+
+    user.is_verified = True
+    user.otp = None
+    user.otp_expiry = None
+    db.commit()
+
+    payload = JWT_Payload(
+        user.id,
+        user.first_name,
+        user.last_name,
+        user.email,
+        user.university,
+        user.state,
+        user.created_at,
+        user.last_login,
+        user.updated_at,
+    )
+
+    token = create_token(payload)
+    IS_PROD = ENV == "production"
+
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        max_age=7 * 24 * 60 * 60,
+        samesite="none" if IS_PROD else "lax",
+        secure=True if IS_PROD else False,
+        path="/",
+    )
+
+    return success_res("Email verified successfully.")

@@ -16,7 +16,7 @@ class User(Base):
     university = Column(String(255), nullable=False)
     state = Column(String(255), nullable=False)
 
-    otp = Column(String(10), nullable=True)
+    otp = Column(String(6), nullable=True)
     otp_expiry = Column(DateTime, nullable=True)
 
     reset_token = Column(String(255), nullable=True)

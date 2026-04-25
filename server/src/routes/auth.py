@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends
-from src.controllers import register_func, auth_root_func
-from src.schemas import RegisterSchema
+from fastapi import APIRouter, Depends, Response
+from src.controllers import register_func, auth_root_func, verify_otp_func
+from src.schemas import RegisterSchema, VerifyOtpSchema
 from sqlalchemy.orm import Session
 from src.configs import get_db
 
@@ -18,8 +18,10 @@ async def register_user(body: RegisterSchema, db: Session = Depends(get_db)):
 
 
 @auth_router.post("/verify-otp")
-def verify_otp():
-    pass
+def verify_otp(
+    body: VerifyOtpSchema, response: Response, db: Session = Depends(get_db)
+):
+    return verify_otp_func(body, db, response)
 
 
 @auth_router.post("/resend-otp")

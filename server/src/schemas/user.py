@@ -7,3 +7,8 @@ class RegisterSchema(BaseModel):
     password: str
     university: str
     state: str
+
+
+class VerifyOtpSchema(BaseModel):
+    email: EmailStr
+    otp: str
