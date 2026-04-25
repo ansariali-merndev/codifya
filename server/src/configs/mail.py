@@ -1,6 +1,6 @@
 from fastapi_mail import MessageSchema, FastMail
 from fastapi_mail import ConnectionConfig
-from env import GMAIL_PASS, GMAIL_USER
+from env import GMAIL_PASS, GMAIL_USER, FRONTED_URI
 from datetime import datetime
 
 conf = ConnectionConfig(
@@ -80,6 +80,73 @@ async def send_mail(email, otp):
 
     message = MessageSchema(
         subject="Verify your email address",
+        recipients=[email],
+        body=body,
+        subtype="html",
+    )
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
+
+async def send_foget_password_mail(email: str, token: str):
+    reset_link = f"{FRONTED_URI}/reset-password?token={token}"
+
+    body = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family:Arial,sans-serif;background:#f6f9fc;margin:0;padding:0;">
+        <table width="100%" style="padding:20px 0;">
+            <tr>
+                <td align="center">
+                    <table width="480" style="background:#fff;padding:30px;border-radius:10px;">
+                        
+                        <tr>
+                            <td align="center">
+                                <h2>Codifya</h2>
+                                <p style="color:#777;">Password Reset</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-size:15px;color:#333;line-height:1.6;">
+                                We received a request to reset your password.
+                                Click below to proceed.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align="center" style="padding:25px 0;">
+                                <a href="{reset_link}"
+                                   style="background:#2563eb;color:#fff;padding:12px 20px;
+                                   text-decoration:none;border-radius:6px;display:inline-block;">
+                                    Reset Password
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-size:13px;color:#777;line-height:1.5;">
+                                This link will expire soon. If you didn’t request this, ignore this email.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding-top:20px;font-size:12px;color:#aaa;text-align:center;">
+                                © {datetime.now().year} Codifya
+                            </td>
+                        </tr>
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+
+    message = MessageSchema(
+        subject="Reset Your Password",
         recipients=[email],
         body=body,
         subtype="html",

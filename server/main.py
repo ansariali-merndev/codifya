@@ -4,7 +4,6 @@ from src.configs import Base, engine
 from src.routes import root_router, auth_router
 from src.utils import error_res
 
-Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
