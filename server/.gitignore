@@ -1,36 +1,63 @@
-# dependencies
-node_modules/
+# 🔥 Python
 
-# build output
-dist/
-build/
+**pycache**/
+*.py[cod]
+*$py.class
 
-# logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# 🔥 Virtual Environment
 
-# environment variables
+venv/
+env/
+ENV/
+.venv/
+
+# 🔥 Environment Variables (IMPORTANT)
+
 .env
-.env.local
-.env.*.local
+.env.*
 
-# TypeScript
-*.tsbuildinfo
+# 🔥 Logs
 
-# OS files
+*.log
+
+# 🔥 Database
+
+*.db
+*.sqlite3
+
+# 🔥 Cache
+
+.cache/
+.pytest_cache/
+
+# 🔥 IDE / Editor
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 🔥 OS files
+
 .DS_Store
 Thumbs.db
 
-# IDE / Editor
-.vscode/
-.idea/
+# 🔥 Build / Distribution
 
-# coverage
-coverage/
+build/
+dist/
+*.egg-info/
 
-# misc
-.tmp/
-.temp/
+# 🔥 Coverage reports
+
+.coverage
+htmlcov/
+
+# 🔥 FastAPI specific (optional uploads etc.)
+
+uploads/
+media/
+
+# 🔥 Migrations (optional - agar tu alembic use karta hai)
+
+# migrations/versions/
